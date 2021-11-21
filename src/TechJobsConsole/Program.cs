@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TechJobsConsole
 {
@@ -33,14 +34,21 @@ namespace TechJobsConsole
                 if (actionChoice.Equals("list"))
                 {
                     string columnChoice = GetUserSelection("List", columnChoices);
+                    List<Dictionary<string, string>> searchResults;
 
                     if (columnChoice.Equals("all"))
                     {
-                        PrintJobs(JobData.FindAll());
+                        searchResults = JobData.FindAll();
+                        searchResults = searchResults.OrderBy(x => x.ContainsKey("name") ? x["name"] : string.Empty).ToList();
+                        PrintJobs(searchResults);
                     }
                     else
                     {
                         List<string> results = JobData.FindAll(columnChoice);
+                        //results.Sort();
+                        results = results.OrderBy(x => x).ToList();
+                        
+                        
 
                         Console.WriteLine("\n*** All " + columnChoices[columnChoice] + " Values ***");
                         foreach (string item in results)
@@ -63,11 +71,18 @@ namespace TechJobsConsole
                     // Fetch results
                     if (columnChoice.Equals("all"))
                     {
-                        Console.WriteLine("Search all fields not yet implemented.");
+                        //    ****** Create Method FindByValue ******
+
+                        
+                        searchResults = JobData.FindByValue(searchTerm);
+                        searchResults = searchResults.OrderBy(x => x.ContainsKey("name") ? x["name"] : string.Empty).ToList();
+                        PrintJobs(searchResults);
+
                     }
                     else
                     {
                         searchResults = JobData.FindByColumnAndValue(columnChoice, searchTerm);
+                        searchResults = searchResults.OrderBy(x => x.ContainsKey("name") ? x["name"] : string.Empty).ToList();
                         PrintJobs(searchResults);
                     }
                 }
@@ -102,7 +117,7 @@ namespace TechJobsConsole
                 string input = Console.ReadLine();
                 choiceIdx = int.Parse(input);
 
-                if (choiceIdx < 0 || choiceIdx >= choiceKeys.Length)
+                if (choiceIdx < 0 || choiceIdx >= choiceKeys.Length )
                 {
                     Console.WriteLine("Invalid choices. Try again.");
                 }
@@ -118,7 +133,27 @@ namespace TechJobsConsole
 
         private static void PrintJobs(List<Dictionary<string, string>> someJobs)
         {
-            Console.WriteLine("PrintJobs is not implemented yet");
+           //Console.WriteLine("PrintJobs is not implemented yet");
+           foreach(Dictionary<string, string> job in someJobs)
+            {
+                
+                if (someJobs.Count > 0) 
+                {
+                    Console.WriteLine("*****");
+                    {
+                        foreach (KeyValuePair<string, string> kvp in job)
+                        {
+                            Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                        }
+                    }
+                    Console.WriteLine("*****");
+                }
+                else
+                {
+                    Console.WriteLine("There are no jobs for your search");
+                }
+                
+            }
         }
     }
 }
